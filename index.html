@@ -745,10 +745,8 @@ function parseSvg() {
 
     animWarning.classList.toggle('visible', isAnimated);
 
-    // Render preview
-    previewContainer.innerHTML = '';
-    const clone = svg.cloneNode(true);
-    previewContainer.appendChild(clone);
+    // Render preview via innerHTML (more reliable than cloneNode from XML parser)
+    previewContainer.innerHTML = currentSvg;
 
     parseStatus.textContent = 'valid svg';
     parseStatus.className = 'ok';
