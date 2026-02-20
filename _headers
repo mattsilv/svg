@@ -1,0 +1,8 @@
+/index.html
+  Cache-Control: no-cache, must-revalidate
+
+/
+  Cache-Control: no-cache, must-revalidate
+
+/og.png
+  Cache-Control: public, max-age=86400
