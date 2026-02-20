@@ -458,6 +458,31 @@
     box-shadow: none;
   }
 
+  .btn-copy {
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--accent);
+    background: var(--accent-dim);
+    border: 1px solid var(--accent);
+    padding: 0.7rem 1.5rem;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.02em;
+  }
+
+  .btn-copy:hover {
+    background: var(--accent-glow);
+  }
+
+  .btn-copy:active { transform: scale(0.98); }
+
+  .btn-copy:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+
   .download-info {
     font-family: var(--mono);
     font-size: 0.7rem;
@@ -612,6 +637,7 @@
 
       <div class="download-row">
         <button class="btn-download" id="downloadBtn" onclick="doDownload()">Download</button>
+        <button class="btn-copy" id="copyBtn" onclick="doCopy()">Copy image</button>
         <span class="download-info" id="downloadInfo">256 &times; 256 &middot; PNG &middot; transparent</span>
       </div>
     </div>
@@ -802,6 +828,24 @@ function rasterize(svgStr, w, h, fmt, transparent, circle) {
     img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('SVG render failed')); };
     img.src = url;
   });
+}
+
+async function doCopy() {
+  if (!currentSvg) return;
+  const transparent = document.getElementById('optTransparent').checked;
+  const circle = document.getElementById('optCircle').checked;
+
+  try {
+    document.getElementById('copyBtn').disabled = true;
+    // Clipboard API only supports PNG
+    const blob = await rasterize(currentSvg, selectedW, selectedH, 'png', transparent, circle);
+    await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+    showToast('Image copied to clipboard');
+  } catch (e) {
+    showToast('Copy failed: ' + e.message);
+  } finally {
+    document.getElementById('copyBtn').disabled = false;
+  }
 }
 
 function downloadBlob(blob, filename) {
