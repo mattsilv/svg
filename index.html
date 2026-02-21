@@ -660,6 +660,7 @@
           <label class="size-x">Format</label>
           <select class="format-select" id="formatSelect" onchange="updateOptions()">
             <option value="png">PNG</option>
+            <option value="gif">GIF</option>
             <option value="svg">SVG</option>
             <option value="webp">WebP</option>
           </select>
@@ -672,7 +673,7 @@
       </div>
 
       <div class="anim-warning" id="animWarning">
-        Animated SVG detected. PNG/WebP exports capture a static frame. Use SVG format to preserve animation.
+        Animated SVG detected. Select <strong>GIF</strong> format to capture the animation, or SVG to preserve it losslessly. PNG/WebP export a static frame.
       </div>
 
       <div class="download-row">

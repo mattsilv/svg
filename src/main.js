@@ -1,5 +1,7 @@
 import { parseSvgString } from './parser.js';
 import { rasterize } from './rasterizer.js';
+import { rasterizeGif } from './gif-rasterizer.js';
+import { getAnimationDuration } from './animation.js';
 import { debounce, downloadBlob, showToast } from './utils.js';
 
 // Launch date
@@ -92,7 +94,8 @@ function updateOptions() {
   const parts = [];
   if (fmt !== 'svg') parts.push(`${selectedW} &times; ${selectedH}`);
   parts.push(fmt.toUpperCase());
-  if (transparent && fmt !== 'svg') parts.push('transparent');
+  if (fmt === 'gif' && isAnimated) parts.push('animated');
+  if (transparent && fmt !== 'svg' && fmt !== 'gif') parts.push('transparent');
   if (circle && fmt !== 'svg') parts.push('circle');
 
   downloadInfo.innerHTML = parts.join(' &middot; ');
@@ -115,13 +118,23 @@ window.doDownload = async function() {
 
   try {
     downloadBtn.disabled = true;
-    const blob = await rasterize(currentSvg, selectedW, selectedH, fmt, transparent, circle);
-    downloadBlob(blob, `icon-${selectedW}x${selectedH}.${fmt}`);
-    showToast(`${fmt.toUpperCase()} downloaded`, toastEl);
+    let blob;
+    if (fmt === 'gif') {
+      const durationMs = getAnimationDuration(currentSvg);
+      downloadBtn.textContent = `Capturing ${(durationMs / 1000).toFixed(1)}s…`;
+      blob = await rasterizeGif(currentSvg, selectedW, selectedH, transparent, circle, durationMs);
+      downloadBlob(blob, `icon-${selectedW}x${selectedH}.gif`);
+      showToast('GIF downloaded', toastEl);
+    } else {
+      blob = await rasterize(currentSvg, selectedW, selectedH, fmt, transparent, circle);
+      downloadBlob(blob, `icon-${selectedW}x${selectedH}.${fmt}`);
+      showToast(`${fmt.toUpperCase()} downloaded`, toastEl);
+    }
   } catch (e) {
     showToast('Export failed: ' + e.message, toastEl);
   } finally {
     downloadBtn.disabled = false;
+    downloadBtn.textContent = 'Download';
   }
 };
 
