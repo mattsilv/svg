@@ -2,7 +2,7 @@
  * Capture animated SVG frames in real-time and encode as GIF.
  * Uses gifenc (by Matt DesLauriers) for encoding.
  */
-import { GIFEncoder, quantize, applyPalette } from 'https://esm.sh/gifenc@1.0.3';
+import { GIFEncoder, quantize, applyPalette } from 'gifenc';
 export { getAnimationDuration } from './animation.js';
 
 
