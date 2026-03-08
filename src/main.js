@@ -3,6 +3,7 @@ import { rasterize } from './rasterizer.js';
 import { rasterizeGif } from './gif-rasterizer.js';
 import { getAnimationDuration } from './animation.js';
 import { debounce, downloadBlob, showToast } from './utils.js';
+import { generateIconPack } from './icon-pack.js';
 
 // Launch date
 const launch = new Date('2026-02-19');
@@ -135,6 +136,25 @@ window.doDownload = async function() {
   } finally {
     downloadBtn.disabled = false;
     downloadBtn.textContent = 'Download';
+  }
+};
+
+window.doAppIcons = async function() {
+  if (!currentSvg) return;
+  const btn = document.getElementById('appIconBtn');
+  try {
+    btn.disabled = true;
+    btn.textContent = 'Generating…';
+    const zip = await generateIconPack(currentSvg, (done, total) => {
+      btn.textContent = `${done}/${total} icons…`;
+    });
+    downloadBlob(zip, 'app-icons.zip');
+    showToast('App icons ZIP downloaded', toastEl);
+  } catch (e) {
+    showToast('Export failed: ' + e.message, toastEl);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'App Icons (ZIP)';
   }
 };
 
